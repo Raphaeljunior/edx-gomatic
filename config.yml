@@ -447,6 +447,71 @@ tools:
       - *deployment-edx
     enabled: True
 
+  # Catalog/Discovery Service latest
+  # Pre-release pipeline which includes all materials.
+  - script: edxpipelines/pipelines/prerelease_materials.py
+    input_files:
+      - *tools-admin
+      - *stage-edx
+      - *prod-stage-discovery
+      - "../gomatic-secure/gocd/vars/tools/discovery-prerelease-materials.yml"
+    enabled: True
+
+  # Stage discovery BMD
+  - script: edxpipelines/pipelines/cd_discovery_latest.py
+    input_files:
+      - *tools-admin
+      - "../gomatic-secure/gocd/vars/tools/environment-deployment-play/stage-edx-discovery-latest.yml"
+      - *stage-edx
+      - *prod-stage-discovery
+      - *play-discovery
+      - *deployment-edx
+      - *prerelease_upstream
+    enabled: True
+
+  # Prod discovery B
+  - script: edxpipelines/pipelines/cd_discovery_latest.py
+    input_files:
+      - *tools-admin
+      - *prod-edx-discovery-latest
+      - *prod-edx
+      - *prod-stage-discovery
+      - *play-discovery
+      - *deployment-edx
+      - *prerelease_upstream
+    bmd_steps: "b"
+    enabled: True
+
+  # Discovery manual verification
+  - script: edxpipelines/pipelines/manual_verification.py
+    input_files:
+      - *tools-admin
+      - "../gomatic-secure/gocd/vars/tools/environment-play/discovery-manual-verification-latest.yml"
+      - *prod-stage-discovery
+    enabled: True
+
+  # Prod discovery MD
+  - script: edxpipelines/pipelines/cd_discovery_latest.py
+    input_files:
+      - *tools-admin
+      - *prod-edx-discovery-latest
+      - *prod-edx
+      - *prod-stage-discovery
+      - *play-discovery
+      - *deployment-edx
+      - "../gomatic-secure/gocd/vars/tools/environment-deployment-play/prod-edx-discovery-gated-upstream.yml"
+    bmd_steps: "md"
+    enabled: True
+
+  # Prod discovery rollback
+  - script: edxpipelines/pipelines/rollback_asgs.py
+    input_files:
+      - *tools-admin
+      - "../gomatic-secure/gocd/vars/tools/environment-deployment-play/prod-edx-discovery-rollback-asgs-latest.yml"
+      - *prod-stage-edxapp
+      - *deployment-edx
+    enabled: True
+
   # E-Commerce Worker
   - script: edxpipelines/pipelines/cd_ecomworker.py
     input_files:
