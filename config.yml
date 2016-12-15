@@ -27,6 +27,10 @@ anchors:
   - &prod-edx-edxapp-latest  "../gomatic-secure/gocd/vars/tools/environment-deployment-play/prod-edx-edxapp-latest.yml"
   - &prod-edge-edxapp-latest "../gomatic-secure/gocd/vars/tools/environment-deployment-play/prod-edge-edxapp-latest.yml"
 
+  - &prod-stage-discovery "../gomatic-secure/gocd/vars/tools/environment-play/prod-stage-discovery.yml"
+  - &discovery_prerelease_upstream "../gomatic-secure/gocd/vars/tools/environment-deployment-play/stage-edx-discovery-prerelease-upstream.yml"
+  - &prod-edx-discovery-v2 "../gomatic-secure/gocd/vars/tools/environment-deployment-play/prod-edx-discovery-v2.yml"
+
 tools:
   ## Start of 'Janitors' pipeline group
 
@@ -447,8 +451,11 @@ tools:
       - *deployment-edx
     enabled: True
 
-  # Catalog/Discovery Service latest
-  # Pre-release pipeline which includes all materials.
+  # Catalog/Discovery Service v2
+  # This version builds stage and prod AMIs in parallel.
+  # Stage is migrated, deployed, and manually verified before prod is migrated and deployed.
+
+  # Pre-release pipeline which installs materials specified in config.
   - script: edxpipelines/pipelines/prerelease_materials.py
     input_files:
       - *tools-admin
@@ -457,8 +464,8 @@ tools:
       - "../gomatic-secure/gocd/vars/tools/discovery-prerelease-materials.yml"
     enabled: True
 
-  # Stage discovery BMD
-  - script: edxpipelines/pipelines/cd_discovery_latest.py
+  # Stage discovery build (B), migrate (M), deploy (D).
+  - script: edxpipelines/pipelines/cd_discovery_v2.py
     input_files:
       - *tools-admin
       - "../gomatic-secure/gocd/vars/tools/environment-deployment-play/stage-edx-discovery-latest.yml"
@@ -466,19 +473,19 @@ tools:
       - *prod-stage-discovery
       - *play-discovery
       - *deployment-edx
-      - *prerelease_upstream
+      - *discovery_prerelease_upstream
     enabled: True
 
   # Prod discovery B
-  - script: edxpipelines/pipelines/cd_discovery_latest.py
+  - script: edxpipelines/pipelines/cd_discovery_v2.py
     input_files:
       - *tools-admin
-      - *prod-edx-discovery-latest
+      - *prod-edx-discovery-v2
       - *prod-edx
       - *prod-stage-discovery
       - *play-discovery
       - *deployment-edx
-      - *prerelease_upstream
+      - *discovery_prerelease_upstream
     bmd_steps: "b"
     enabled: True
 
@@ -491,10 +498,10 @@ tools:
     enabled: True
 
   # Prod discovery MD
-  - script: edxpipelines/pipelines/cd_discovery_latest.py
+  - script: edxpipelines/pipelines/cd_discovery_v2.py
     input_files:
       - *tools-admin
-      - *prod-edx-discovery-latest
+      - *prod-edx-discovery-v2
       - *prod-edx
       - *prod-stage-discovery
       - *play-discovery

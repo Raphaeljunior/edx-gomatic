@@ -941,9 +941,9 @@ def generate_armed_stage(pipeline, stage_name):
     Generates a stage that can be used to "arm" a pipeline.
 
     When using a fan in or fan out GoCD will ensure the consistency of materials used between pipelines. To accomplish
-     this all pipelines must be set to to trigger on success. This stage generates a simple echo statement that can
-     be used to "arm" a pipeline. The stage that follows this must set the manual_approval flag via:
-     set_has_manual_approval()
+    this all pipelines must be set to trigger on success. This stage generates a simple echo statement that can
+    be used to "arm" a pipeline. The stage that follows this must set the manual_approval flag via:
+    set_has_manual_approval()
 
     Using this pattern allows a pipeline to be be set as automatic, but then pause and wait for input from the user.
 
