@@ -468,7 +468,7 @@ tools:
   - script: edxpipelines/pipelines/cd_discovery_v2.py
     input_files:
       - *tools-admin
-      - "../gomatic-secure/gocd/vars/tools/environment-deployment-play/stage-edx-discovery-latest.yml"
+      - "../gomatic-secure/gocd/vars/tools/environment-deployment-play/stage-edx-discovery-v2.yml"
       - *stage-edx
       - *prod-stage-discovery
       - *play-discovery
@@ -493,7 +493,7 @@ tools:
   - script: edxpipelines/pipelines/manual_verification.py
     input_files:
       - *tools-admin
-      - "../gomatic-secure/gocd/vars/tools/environment-play/discovery-manual-verification-latest.yml"
+      - "../gomatic-secure/gocd/vars/tools/environment-play/discovery-manual-verification.yml"
       - *prod-stage-discovery
     enabled: True
 
@@ -514,7 +514,7 @@ tools:
   - script: edxpipelines/pipelines/rollback_asgs.py
     input_files:
       - *tools-admin
-      - "../gomatic-secure/gocd/vars/tools/environment-deployment-play/prod-edx-discovery-rollback-asgs-latest.yml"
+      - "../gomatic-secure/gocd/vars/tools/environment-deployment-play/prod-edx-discovery-rollback-asgs.yml"
       - *prod-stage-edxapp
       - *deployment-edx
     enabled: True
