@@ -3,6 +3,7 @@ from gomatic import BuildArtifact, ExecTask
 from edxpipelines import constants
 from edxpipelines.patterns import tasks
 
+
 def generate_base_ami_selection(pipeline,
                                 stage,
                                 aws_access_key_id,
