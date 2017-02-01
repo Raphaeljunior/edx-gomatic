@@ -271,6 +271,14 @@ def install_pipelines(configurator, config, env_configs):
         env_configs['prod-edge'],
     )
 
+    migration_rollback_edx = edxapp.rollback_database(
+        edxapp_deploy_group,
+        'PROD_edx_edxapp_Rollback_Migrations_latest',
+        env_configs['prod-edx'],
+        prod_edx_b,
+        prod_edx_md
+    )
+
     deploy_artifact = utils.ArtifactLocation(
         prod_edx_md.name,
         constants.DEPLOY_AMI_STAGE_NAME,
