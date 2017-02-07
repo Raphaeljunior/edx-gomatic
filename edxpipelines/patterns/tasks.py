@@ -1307,6 +1307,12 @@ def generate_message_pull_requests_in_commit_range(
     Returns:
         gomatic.task.Task
     """
+    flag_for_release_status = {
+        constants.ReleaseStatus.STAGED: 'release_stage',
+        constants.ReleaseStatus.DEPLOYED: 'release_prod',
+        constants.ReleaseStatus.ROLLED_BACK: 'release_rollback',
+    }
+
     command = [
         'python ',
         'scripts/message_prs_in_range.py',
@@ -1314,7 +1320,7 @@ def generate_message_pull_requests_in_commit_range(
         '--token', token,
         '--repo', repo,
         '--head_sha', head_sha,
-        '--{}'.format(release_status)
+        '--{}'.format(flag_for_release_status[release_status])
     ]
     if base_sha:
         command.extend(['--base_sha', base_sha])
@@ -1383,7 +1389,7 @@ def generate_release_wiki_page(
     if input_artifact and any([parent_title, space, title]):
         raise ValueError("input_artifact and parent_title/space/title are mutually exclusive.")
 
-    pipeline.ensure_encrypted_environment_variables(
+    pipeline.ensure_unencrypted_secure_environment_variables(
         {
             'CONFLUENCE_PASSWORD': confluence_password,
             'GITHUB_TOKEN': github_token,
@@ -1408,9 +1414,10 @@ def generate_release_wiki_page(
     ]
 
     if input_artifact:
+        input_wiki_id_path = '{}/{}'.format(constants.ARTIFACT_PATH, 'input_release_page_id.yml')
         command.extend([
             '--in-file',
-            '{}/{}'.format(constants.ARTIFACT_PATH, input_artifact.file_name)
+            input_wiki_id_path,
         ])
         job.add_task(
             FetchArtifactTask(
@@ -1418,7 +1425,7 @@ def generate_release_wiki_page(
                 stage=input_artifact.stage,
                 job=input_artifact.job,
                 src=FetchArtifactFile(input_artifact.file_name),
-                dest=constants.ARTIFACT_PATH,
+                dest=input_wiki_id_path,
             )
         )
     else:
@@ -1432,14 +1439,15 @@ def generate_release_wiki_page(
     for base, new in ami_pairs:
         command.append('-c')
         for artifact in (base, new):
-            command.append('{}/{}'.format(constants.ARTIFACT_PATH, artifact.file_name))
+            output_path = '{}/{}.{}'.format(constants.ARTIFACT_PATH, artifact.pipeline, artifact.file_name)
+            command.append(output_path)
             job.add_task(
                 FetchArtifactTask(
                     pipeline=artifact.pipeline,
                     stage=artifact.stage,
                     job=artifact.job,
                     src=FetchArtifactFile(artifact.file_name),
-                    dest=constants.ARTIFACT_PATH,
+                    dest=output_path,
                 )
             )
 
