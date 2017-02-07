@@ -163,7 +163,6 @@ def install_pipelines(configurator, config, env_configs):
             )
         )
 
-
     manual_verification = edxapp.manual_verification(
         edxapp_deploy_group,
         config,
@@ -255,8 +254,6 @@ def install_pipelines(configurator, config, env_configs):
         deploy.ensure_material(
             PipelineMaterial(stage_md.name, constants.MESSAGE_PR_STAGE_NAME, "stage_message_prs")
         )
-
-
 
     for pipeline in (stage_b, stage_md, prod_edx_b, prod_edx_md, prod_edge_b, prod_edge_md):
         for material in (

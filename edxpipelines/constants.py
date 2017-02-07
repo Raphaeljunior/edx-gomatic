@@ -121,6 +121,7 @@ VALID_PIPELINE_STEP_PERMUTATIONS = {
     'b': 'B'
 }
 
+
 class ReleaseStatus(Enum):
     STAGED = 'STAGED'
     DEPLOYED = 'DEPLOYED'
@@ -128,4 +129,3 @@ class ReleaseStatus(Enum):
     stage = STAGED
     prod = DEPLOYED
     rollback = ROLLED_BACK
-
