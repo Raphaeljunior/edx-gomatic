@@ -593,6 +593,12 @@ def rollback_database(pipeline_group, pipeline_name, config, build_pipeline, dep
             sub_application_name=sub_app
         )
 
+    launch_info_location = utils.ArtifactLocation(
+        pipeline.name,
+        constants.LAUNCH_INSTANCE_STAGE_NAME,
+        constants.LAUNCH_INSTANCE_JOB_NAME,
+        constants.LAUNCH_INSTANCE_FILENAME
+    )
     stages.generate_terminate_instance(
         pipeline,
         launch_info_location,
