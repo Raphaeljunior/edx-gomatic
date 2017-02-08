@@ -118,12 +118,6 @@ def build_migrate_deploy_subset_pipeline(
             config['edx_environment'],
             base_ami_id
         )
-        ami_artifact = utils.ArtifactLocation(
-            pipeline.name,
-            constants.BASE_AMI_SELECTION_STAGE_NAME,
-            constants.BASE_AMI_SELECTION_JOB_NAME,
-            FetchArtifactFile(constants.BASE_AMI_OVERRIDE_FILENAME),
-        )
 
     launch_stage = stages.generate_launch_instance(
         pipeline,
@@ -523,11 +517,11 @@ def rollback_database(pipeline_group, pipeline_name, config, build_pipeline, dep
         constants.LAUNCH_INSTANCE_JOB_NAME,
         'key.pem'
     )
-    launch_info_location = utils.ArtifactLocation(
-        pipeline.name,
-        constants.LAUNCH_INSTANCE_STAGE_NAME,
-        constants.LAUNCH_INSTANCE_JOB_NAME,
-        FetchArtifactFile(constants.LAUNCH_INSTANCE_FILENAME)
+    base_ami_file_location = utils.ArtifactLocation(
+        build_pipeline.name,
+        constants.BASE_AMI_SELECTION_STAGE_NAME,
+        constants.BASE_AMI_SELECTION_JOB_NAME,
+        FetchArtifactFile(constants.BASE_AMI_OVERRIDE_FILENAME)
     )
 
     for material in (
@@ -567,7 +561,7 @@ def rollback_database(pipeline_group, pipeline_name, config, build_pipeline, dep
         config['ec2_security_group_id'],
         config['ec2_instance_profile_name'],
         None,
-        upstream_build_artifact=launch_info_location
+        upstream_build_artifact=base_ami_file_location
     )
     launch_stage.set_has_manual_approval()
 
