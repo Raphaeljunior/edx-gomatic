@@ -225,25 +225,27 @@ def generate_create_ami(job, runif="passed", **kwargs):
 
     """
     job.ensure_artifacts(set([BuildArtifact('{}/ami.yml'.format(constants.ARTIFACT_PATH))]))
+    variables = {
+        'play': '$PLAY',
+        'deployment': '$DEPLOYMENT',
+        'edx_environment': '$EDX_ENVIRONMENT',
+        'app_repo': '$APP_REPO',
+        'configuration_repo': '$CONFIGURATION_REPO',
+        'configuration_version': '$GO_REVISION_CONFIGURATION',
+        'configuration_secure_repo': '$CONFIGURATION_SECURE_REPO',
+        'cache_id': '$GO_PIPELINE_COUNTER',
+        'ec2_region': '$EC2_REGION',
+        'artifact_path': '`/bin/pwd`/../{}'.format(constants.ARTIFACT_PATH),
+        'hipchat_token': '$HIPCHAT_TOKEN',
+        'hipchat_room': '"$HIPCHAT_ROOM"',
+        'ami_wait': '$AMI_WAIT',
+        'no_reboot': '$NO_REBOOT',
+        'extra_name_identifier': '$GO_PIPELINE_COUNTER'
+    }
+    variables.update(kwargs)
 
     return job.add_task(ansible_task(
-        variables={
-            'play': '$PLAY',
-            'deployment': '$DEPLOYMENT',
-            'edx_environment': '$EDX_ENVIRONMENT',
-            'app_repo': '$APP_REPO',
-            'configuration_repo': '$CONFIGURATION_REPO',
-            'configuration_version': '$GO_REVISION_CONFIGURATION',
-            'configuration_secure_repo': '$CONFIGURATION_SECURE_REPO',
-            'cache_id': '$GO_PIPELINE_COUNTER',
-            'ec2_region': '$EC2_REGION',
-            'artifact_path': '`/bin/pwd`/../{}'.format(constants.ARTIFACT_PATH),
-            'hipchat_token': '$HIPCHAT_TOKEN',
-            'hipchat_room': '"$HIPCHAT_ROOM"',
-            'ami_wait': '$AMI_WAIT',
-            'no_reboot': '$NO_REBOOT',
-            'extra_name_identifier': '$GO_PIPELINE_COUNTER'
-        },
+        variables=variables,
         extra_options=['--module-path=playbooks/library'],
         override_files=['{}/launch_info.yml'.format(constants.ARTIFACT_PATH)],
         playbook='playbooks/continuous_delivery/create_ami.yml',
