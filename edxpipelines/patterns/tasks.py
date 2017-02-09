@@ -373,6 +373,7 @@ def generate_check_migration_duration(job,
     return job.add_task(tubular_task(
         'check_migrate_duration.py',
         cmd_args,
+        runif=runif,
     ))
 
 
@@ -1173,6 +1174,7 @@ def _generate_message_pull_requests_in_commit_range(
     return job.add_task(tubular_task(
         'message_prs_in_range.py',
         arguments,
+        runif=runif,
     ))
 
 
