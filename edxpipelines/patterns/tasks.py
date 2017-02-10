@@ -304,7 +304,8 @@ def generate_check_migration_duration(job,
 def generate_migration_rollback(
         job,
         sub_application_name=None,
-        runif="passed"):
+        runif="passed"
+):
     """
     Generates GoCD task that runs migrations via an Ansible script.
 

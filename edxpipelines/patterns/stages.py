@@ -731,7 +731,7 @@ def generate_rollback_migrations(pipeline,
         db_migration_pass (str): Password for the DB user used to run migrations.
         inventory_location (ArtifactLocation): Location of inventory containing the IP address of the EC2 instance, for fetching.
         instance_key_location (ArtifactLocation): Location of SSH key used to access the EC2 instance, for fetching.
-        launch_info_location (ArtifactLocation): Location of the launch_info.yml file for fetching
+        migration_info_location (ArtifactLocation): Location of the migration files
         application_user (str): Username to use while running the migrations
         application_name (str): Name of the application (e.g. edxapp, programs, etc...)
         application_path (str): path of the application installed on the target machine

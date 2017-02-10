@@ -10,6 +10,18 @@ def generate_rollback_migration(stage,
                                 migration_info_location,
                                 sub_application_name=None
                                 ):
+    """
+
+    Args:
+        stage (gomatic.gocd.pipeliens.Stage): Stage this job will be part of
+        inventory_location (utils.ArtifactLocation): Location of the ansible inventory location
+        instance_key_location (utils.ArtifactLocation): Location of key used to ssh in to the instance
+        migration_info_location (utils.ArtifactLocation): Location of the migration output to roll back
+        sub_application_name (str): additional command to be passed to the migrate app {cms|lms}
+
+    Returns:
+
+    """
     job_name = constants.ROLLBACK_MIGRATIONS_JOB_NAME
     if sub_application_name is not None:
         job_name += "_{}".format(sub_application_name)
@@ -35,9 +47,6 @@ def generate_rollback_migration(stage,
     }
     job.add_task(FetchArtifactTask(**artifact_params))
 
-    # ensure the target directoy exists
-    tasks.generate_target_directory(job)
-
     # fetch the migration outputs
     artifact_params = {
         "pipeline": migration_info_location.pipeline,
@@ -47,6 +56,9 @@ def generate_rollback_migration(stage,
         "dest": constants.ARTIFACT_PATH
     }
     job.add_task(FetchArtifactTask(**artifact_params))
+
+    # ensure the target directoy exists
+    tasks.generate_target_directory(job)
 
     # The SSH key used to access the EC2 instance needs specific permissions.
     job.add_task(

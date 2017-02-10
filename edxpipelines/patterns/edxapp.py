@@ -486,22 +486,29 @@ def rollback_asgs(edxapp_deploy_group, pipeline_name, build_pipeline, deploy_pip
 def rollback_database(pipeline_group, pipeline_name, config, build_pipeline, deploy_pipeline):
     """
     Arguments:
-        edxapp_deploy_group (gomatic.PipelineGroup): The group in which to create this pipeline
+        pipeline_group (gomatic.PipelineGroup): The group in which to create this pipeline
         pipeline_name (str): The name of this pipeline
-        deploy_pipeline (gomatic.Pipeline): The pipeline to retrieve the ami_deploy_info.yml artifact from
+        config (dict): the confiuration dictonary for the rollback pipeline's EDC
+        build_pipeline (gomatic.Pipeline): Pipeline source of the launch info (ami-id)
+        deploy_pipeline (gomatic.Pipeline): Pipeline source of the migration information
 
     Configuration Required:
-        tubular_sleep_wait_time
-        asgard_api_endpoints
-        asgard_token
         aws_access_key_id
         aws_secret_access_key
         hipchat_token
+        ec2_vpc_subnet_id
+        ec2_security_group_id
+        ec2_instance_profile_name
+        db_migration_user
+        db_migration_pass
+        play_name
+        application_name
+        edxapp_subapps
     """
     # In order to roll back the migrations:
     # - Launch instance
     # - LMS default/CSMH Rollback migrations
-    # - CMS default/CSMH Rollback migarations
+    # - CMS default/CSMH Rollback migrations
     # - Terminate instances
     pipeline = pipeline_group.ensure_replacement_of_pipeline(pipeline_name)
 
@@ -540,10 +547,7 @@ def rollback_database(pipeline_group, pipeline_name, config, build_pipeline, dep
         )
     )
 
-    # Create the armed stage as this pipeline needs to auto-execute
-    stages.generate_armed_stage(pipeline, constants.ARMED_JOB_NAME)
-
-    # We need the build_pipeline upstream so that we can fetch the artifact from it
+    # We need the build_pipeline upstream so that we can fetch the AMI selection artifact from it
     pipeline.ensure_material(
         PipelineMaterial(
             pipeline_name=build_pipeline.name,
@@ -551,6 +555,9 @@ def rollback_database(pipeline_group, pipeline_name, config, build_pipeline, dep
             material_name='select_base_ami',
         )
     )
+
+    # Create the armed stage as this pipeline needs to auto-execute
+    stages.generate_armed_stage(pipeline, constants.ARMED_JOB_NAME)
 
     # launch instance
     launch_stage = stages.generate_launch_instance(
@@ -589,7 +596,7 @@ def rollback_database(pipeline_group, pipeline_name, config, build_pipeline, dep
 
     launch_info_location = utils.ArtifactLocation(
         pipeline.name,
-        constants.LAUNCH_INSTANCE_STAGE_NAME,
+        launch_stage.name,
         constants.LAUNCH_INSTANCE_JOB_NAME,
         constants.LAUNCH_INSTANCE_FILENAME
     )
