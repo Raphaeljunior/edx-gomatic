@@ -1437,10 +1437,10 @@ def generate_release_wiki_page(
             command.extend(['--title', title])
 
     for base, new in ami_pairs:
-        command.append('-c')
+        compare_option = ['--compare']
         for artifact in (base, new):
             output_path = '{}/{}.{}'.format(constants.ARTIFACT_PATH, artifact.pipeline, artifact.file_name)
-            command.append(output_path)
+            compare_option.append(output_path)
             job.add_task(
                 FetchArtifactTask(
                     pipeline=artifact.pipeline,
@@ -1450,6 +1450,7 @@ def generate_release_wiki_page(
                     dest=output_path,
                 )
             )
+        command.extend(compare_option)
 
     return job.add_task(
         ExecTask(
